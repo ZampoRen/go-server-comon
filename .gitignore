@@ -1,0 +1,42 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build output
+bin/
+dist/
+
+# Config files with sensitive data
+*.local.yaml
+*.local.yml
+
+# Generated proto files (comment out if you want to track generated files)
+# *.pb.go
+# *.pb.gw.go
+
+# Logs
+*.log
+logs/
+
