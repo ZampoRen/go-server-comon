@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "go-server-comon/api/proto/user";
+
+// User 用户服务定义
+service User {
+  // 获取用户信息
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+
+  // 创建用户
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+
+  // 用户列表
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+}
+
+// 获取用户请求
+message GetUserRequest {
+  int64 user_id = 1;
+}
+
+// 获取用户响应
+message GetUserResponse {
+  int64 user_id = 1;
+  string username = 2;
+  string email = 3;
+  string created_at = 4;
+}
+
+// 创建用户请求
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+}
+
+// 创建用户响应
+message CreateUserResponse {
+  int64 user_id = 1;
+  string username = 2;
+  string email = 3;
+  bool success = 4;
+}
+
+// 用户列表请求
+message ListUsersRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+// 用户列表响应
+message ListUsersResponse {
+  repeated UserInfo users = 1;
+  int32 total = 2;
+  int32 page = 3;
+}
+
+// 用户信息
+message UserInfo {
+  int64 user_id = 1;
+  string username = 2;
+  string email = 3;
+}
+

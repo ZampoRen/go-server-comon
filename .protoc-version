@@ -1,0 +1,13 @@
+# protoc version recommendation
+# Install protoc from: https://github.com/protocolbuffers/protobuf/releases
+# Recommended version: 25.x or later
+#
+# For macOS:
+#   brew install protobuf
+#
+# For Linux:
+#   Download from https://github.com/protocolbuffers/protobuf/releases
+#
+# For Windows:
+#   Download from https://github.com/protocolbuffers/protobuf/releases
+
