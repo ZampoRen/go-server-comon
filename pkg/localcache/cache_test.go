@@ -402,14 +402,19 @@ func TestCache_GetLink_CascadeDelete(t *testing.T) {
 	// 删除主键
 	cache.Del(ctx, "user:123")
 
+	time.Sleep(time.Millisecond * 100)
+
 	// 验证关联键也被删除
 	keys := []string{"user:123:profile", "user:123:settings"}
 	for _, key := range keys {
 		fetchCount := 0
+		t.Logf("curr fetchCount1 = %v", fetchCount)
 		_, _ = cache.Get(ctx, key, func(ctx context.Context) (string, error) {
 			fetchCount++
+			t.Logf("=======================")
 			return "new", nil
 		})
+		t.Logf("curr fetchCount2 = %v", fetchCount)
 		if fetchCount == 0 {
 			t.Errorf("关联键 %s 应该被级联删除", key)
 		}
