@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package localcache
+package lcache
 
 import (
 	"strings"
 	"sync"
 
-	"github.com/ZampoRen/go-server-comon/pkg/common/config"
-	"github.com/ZampoRen/go-server-comon/pkg/common/storage/cache/cachekey"
+	"github.com/ZampoRen/go-server-comon/internal/common/config"
+	"github.com/ZampoRen/go-server-comon/internal/common/storage/cache/cachekey"
 )
 
 var (
