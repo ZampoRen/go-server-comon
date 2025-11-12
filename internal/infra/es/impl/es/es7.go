@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/elastic/go-elasticsearch/v7/esutil"
 
-	"github.com/ZampoRen/go-server-comon/infra/es"
+	"github.com/ZampoRen/go-server-comon/internal/infra/es"
 	"github.com/ZampoRen/go-server-comon/pkg/lang/conv"
 	"github.com/ZampoRen/go-server-comon/pkg/lang/ptr"
 	"github.com/cloudwego/hertz/pkg/common/hlog"

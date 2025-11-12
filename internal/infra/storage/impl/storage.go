@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ZampoRen/go-server-comon/infra/storage"
-	"github.com/ZampoRen/go-server-comon/infra/storage/impl/aliyun"
-	"github.com/ZampoRen/go-server-comon/infra/storage/impl/tencent"
-	"github.com/ZampoRen/go-server-comon/infra/storage/impl/volcengine"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage/impl/aliyun"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage/impl/tencent"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage/impl/volcengine"
 	"github.com/ZampoRen/go-server-comon/pkg/envkey"
 )
 

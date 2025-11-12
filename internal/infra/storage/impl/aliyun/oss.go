@@ -1,4 +1,4 @@
-package volcengine
+package aliyun
 
 import (
 	"bytes"
@@ -16,30 +16,30 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 
-	"github.com/ZampoRen/go-server-comon/infra/storage"
-	"github.com/ZampoRen/go-server-comon/infra/storage/impl/internal/fileutil"
-	"github.com/ZampoRen/go-server-comon/infra/storage/impl/internal/util"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage/impl/internal/fileutil"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage/impl/internal/util"
 )
 
-type tosClient struct {
+type ossClient struct {
 	client     *s3.Client
 	bucketName string
 }
 
-// New 创建火山引擎 TOS 客户端
-// 火山引擎 TOS 兼容 S3 API，可以使用 AWS S3 SDK 访问
-// endpoint 格式: https://tos-cn-beijing.volces.com
-// region 格式: cn-beijing
-// 注意：火山引擎 TOS 使用虚拟主机风格（virtual-host style）访问
+// New 创建阿里云 OSS 客户端
+// 阿里云 OSS 兼容 S3 API，可以使用 AWS S3 SDK 访问
+// endpoint 格式: https://oss-cn-hangzhou.aliyuncs.com
+// region 格式: cn-hangzhou
+// 注意：阿里云 OSS 使用虚拟主机风格（virtual-host style）访问
 func New(ctx context.Context, ak, sk, bucketName, endpoint, region string) (storage.Storage, error) {
-	t, err := getTosClient(ctx, ak, sk, bucketName, endpoint, region)
+	t, err := getOSSClient(ctx, ak, sk, bucketName, endpoint, region)
 	if err != nil {
 		return nil, err
 	}
 	return t, nil
 }
 
-func getTosClient(ctx context.Context, ak, sk, bucketName, endpoint, region string) (*tosClient, error) {
+func getOSSClient(ctx context.Context, ak, sk, bucketName, endpoint, region string) (*ossClient, error) {
 	creds := credentials.NewStaticCredentialsProvider(ak, sk, "")
 	cfg, err := config.LoadDefaultConfig(
 		ctx,
@@ -47,7 +47,7 @@ func getTosClient(ctx context.Context, ak, sk, bucketName, endpoint, region stri
 		config.WithRegion(region),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("init volcengine tos config failed, bucketName: %s, endpoint: %s, region: %s, err: %v", bucketName, endpoint, region, err)
+		return nil, fmt.Errorf("init aliyun oss config failed, bucketName: %s, endpoint: %s, region: %s, err: %v", bucketName, endpoint, region, err)
 	}
 
 	// 使用新的推荐方式：在服务客户端选项中直接设置 BaseEndpoint
@@ -58,7 +58,7 @@ func getTosClient(ctx context.Context, ak, sk, bucketName, endpoint, region stri
 		o.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
 	})
 
-	t := &tosClient{
+	t := &ossClient{
 		client:     c,
 		bucketName: bucketName,
 	}
@@ -71,7 +71,7 @@ func getTosClient(ctx context.Context, ak, sk, bucketName, endpoint, region stri
 	return t, nil
 }
 
-func (t *tosClient) CheckAndCreateBucket(ctx context.Context) error {
+func (t *ossClient) CheckAndCreateBucket(ctx context.Context) error {
 	client := t.client
 	bucket := t.bucketName
 
@@ -94,12 +94,12 @@ func (t *tosClient) CheckAndCreateBucket(ctx context.Context) error {
 	return err
 }
 
-func (t *tosClient) PutObject(ctx context.Context, objectKey string, content []byte, opts ...storage.PutOptFn) error {
+func (t *ossClient) PutObject(ctx context.Context, objectKey string, content []byte, opts ...storage.PutOptFn) error {
 	opts = append(opts, storage.WithObjectSize(int64(len(content))))
 	return t.PutObjectWithReader(ctx, objectKey, bytes.NewReader(content), opts...)
 }
 
-func (t *tosClient) PutObjectWithReader(ctx context.Context, objectKey string, content io.Reader, opts ...storage.PutOptFn) error {
+func (t *ossClient) PutObjectWithReader(ctx context.Context, objectKey string, content io.Reader, opts ...storage.PutOptFn) error {
 	client := t.client
 	bucket := t.bucketName
 
@@ -142,7 +142,7 @@ func (t *tosClient) PutObjectWithReader(ctx context.Context, objectKey string, c
 	return err
 }
 
-func (t *tosClient) GetObject(ctx context.Context, objectKey string) ([]byte, error) {
+func (t *ossClient) GetObject(ctx context.Context, objectKey string) ([]byte, error) {
 	client := t.client
 	bucket := t.bucketName
 
@@ -163,7 +163,7 @@ func (t *tosClient) GetObject(ctx context.Context, objectKey string) ([]byte, er
 	return body, nil
 }
 
-func (t *tosClient) DeleteObject(ctx context.Context, objectKey string) error {
+func (t *ossClient) DeleteObject(ctx context.Context, objectKey string) error {
 	client := t.client
 	bucket := t.bucketName
 
@@ -175,7 +175,7 @@ func (t *tosClient) DeleteObject(ctx context.Context, objectKey string) error {
 	return err
 }
 
-func (t *tosClient) GetObjectUrl(ctx context.Context, objectKey string, opts ...storage.GetOptFn) (string, error) {
+func (t *ossClient) GetObjectUrl(ctx context.Context, objectKey string, opts ...storage.GetOptFn) (string, error) {
 	client := t.client
 	bucket := t.bucketName
 	presignClient := s3.NewPresignClient(client)
@@ -203,7 +203,7 @@ func (t *tosClient) GetObjectUrl(ctx context.Context, objectKey string, opts ...
 	return req.URL, nil
 }
 
-func (t *tosClient) ListAllObjects(ctx context.Context, prefix string, opts ...storage.GetOptFn) ([]*storage.FileInfo, error) {
+func (t *ossClient) ListAllObjects(ctx context.Context, prefix string, opts ...storage.GetOptFn) ([]*storage.FileInfo, error) {
 	const (
 		DefaultPageSize = 100
 		MaxListObjects  = 10000
@@ -239,7 +239,7 @@ func (t *tosClient) ListAllObjects(ctx context.Context, prefix string, opts ...s
 	return files, nil
 }
 
-func (t *tosClient) ListObjectsPaginated(ctx context.Context, input *storage.ListObjectsPaginatedInput, opts ...storage.GetOptFn) (*storage.ListObjectsPaginatedOutput, error) {
+func (t *ossClient) ListObjectsPaginated(ctx context.Context, input *storage.ListObjectsPaginatedInput, opts ...storage.GetOptFn) (*storage.ListObjectsPaginatedOutput, error) {
 	if input == nil {
 		return nil, fmt.Errorf("input cannot be nil")
 	}
@@ -322,7 +322,7 @@ func (t *tosClient) ListObjectsPaginated(ctx context.Context, input *storage.Lis
 	return output, nil
 }
 
-func (t *tosClient) HeadObject(ctx context.Context, objectKey string, opts ...storage.GetOptFn) (*storage.FileInfo, error) {
+func (t *ossClient) HeadObject(ctx context.Context, objectKey string, opts ...storage.GetOptFn) (*storage.FileInfo, error) {
 	obj, err := t.client.HeadObject(ctx, &s3.HeadObjectInput{
 		Bucket: aws.String(t.bucketName),
 		Key:    aws.String(objectKey),

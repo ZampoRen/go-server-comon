@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ZampoRen/go-server-comon/infra/es"
+	"github.com/ZampoRen/go-server-comon/internal/infra/es"
 )
 
 // 类型别名

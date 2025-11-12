@@ -16,9 +16,9 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 
-	"github.com/ZampoRen/go-server-comon/infra/storage"
-	"github.com/ZampoRen/go-server-comon/infra/storage/impl/internal/fileutil"
-	"github.com/ZampoRen/go-server-comon/infra/storage/impl/internal/util"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage/impl/internal/fileutil"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage/impl/internal/util"
 )
 
 type cosClient struct {

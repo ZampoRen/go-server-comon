@@ -1,50 +1,47 @@
 package main
 
 import (
+	"context"
 	"log"
-	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 
-	pb "go-server-comon/api/proto/user"
-	"go-server-comon/internal/server/user"
+	"github.com/ZampoRen/go-server-comon/api/router"
 )
 
 func main() {
-	// 创建监听器
-	listener, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
-	}
+	// 创建 Hertz 服务器
+	h := server.Default(
+		server.WithHostPorts(":8888"),
+		server.WithHandleMethodNotAllowed(true),
+	)
 
-	// 创建 gRPC 服务器
-	srv := grpc.NewServer()
-
-	// 创建并注册 User 服务
-	userServer := user.NewServer()
-	pb.RegisterUserServer(srv, userServer)
-
-	// 启用 gRPC 反射服务（用于 grpcurl 等工具）
-	reflection.Register(srv)
+	// 注册路由（使用 hz 生成的路由注册函数）
+	router.GeneratedRegister(h)
 
 	// 启动服务器（在 goroutine 中）
 	go func() {
-		log.Println("User service starting on :50051")
-		if err := srv.Serve(listener); err != nil {
-			log.Fatalf("Failed to serve: %v", err)
-		}
+		h.Spin()
 	}()
 
-	// 等待中断信号以优雅地关闭服务器
+	// 等待中断信号
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	log.Println("Shutting down server...")
-	srv.GracefulStop()
-	log.Println("Server stopped")
+	hlog.Info("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := h.Shutdown(ctx); err != nil {
+		hlog.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server exited")
 }

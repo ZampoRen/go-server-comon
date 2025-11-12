@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sortorder"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/textquerytype"
 
-	"github.com/ZampoRen/go-server-comon/infra/es"
+	"github.com/ZampoRen/go-server-comon/internal/infra/es"
 	"github.com/ZampoRen/go-server-comon/pkg/lang/conv"
 	"github.com/ZampoRen/go-server-comon/pkg/lang/ptr"
 	"github.com/ZampoRen/go-server-comon/pkg/sonic"

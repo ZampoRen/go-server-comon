@@ -7,7 +7,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/ZampoRen/go-server-comon/infra/cache"
+	"github.com/ZampoRen/go-server-comon/internal/infra/cache"
 	"github.com/ZampoRen/go-server-comon/pkg/envkey"
 )
 

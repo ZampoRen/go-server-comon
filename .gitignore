@@ -35,3 +35,6 @@ _testmain.go
 *.local.yml
 dumped_hertz_remote_config.json
 		  
+/cmd/ws-bench/
+/cmd/ws-heartbeat/
+/bin/

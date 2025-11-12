@@ -3,7 +3,7 @@ package fileutil
 import (
 	"context"
 
-	"github.com/ZampoRen/go-server-comon/infra/storage"
+	"github.com/ZampoRen/go-server-comon/internal/infra/storage"
 )
 
 // AssembleFileUrl 为文件列表组装 URL
