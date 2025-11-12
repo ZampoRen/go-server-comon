@@ -2,18 +2,26 @@ syntax = "proto3";
 
 package user;
 
-option go_package = "go-server-comon/api/proto/user";
+import "api.proto";
+
+option go_package = "user";
 
 // User 用户服务定义
 service User {
   // 获取用户信息
-  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (api.get) = "/api/user/:user_id";
+  }
 
   // 创建用户
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (api.post) = "/api/user";
+  }
 
   // 用户列表
-  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (api.get) = "/api/users";
+  }
 }
 
 // 获取用户请求

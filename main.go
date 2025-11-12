@@ -2,45 +2,46 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
-	"runtime/debug"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/coze-dev/coze-studio/backend/pkg/lang/ternary"
-	"github.com/coze-dev/coze-studio/backend/pkg/logs"
-	"github.com/joho/godotenv"
+	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+
+	"github.com/ZampoRen/go-server-comon/api/router"
 )
 
 func main() {
-	ctx := context.Background()
-	// Please do not change the order of the function calls below
-	setCrashOutput()
+	// 创建 Hertz 服务器
+	h := server.Default(
+		server.WithHostPorts(":8888"),
+		server.WithHandleMethodNotAllowed(true),
+	)
 
-}
+	// 注册路由（使用 hz 生成的路由注册函数）
+	router.GeneratedRegister(h)
 
-func loadEnv() (err error) {
-	appEnv := os.Getenv("APP_ENV")
-	fileName := ternary.IFElse(appEnv == "", ".env", ".env."+appEnv)
+	// 启动服务器（在 goroutine 中）
+	go func() {
+		h.Spin()
+	}()
 
-	logs.Infof("load env file: %s", fileName)
+	// 等待中断信号
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 
-	err = godotenv.Load(fileName)
-	if err != nil {
-		return fmt.Errorf("load env file(%s) failed, err=%w", fileName, err)
+	hlog.Info("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := h.Shutdown(ctx); err != nil {
+		hlog.Fatalf("Server forced to shutdown: %v", err)
 	}
 
-	return err
-}
-
-func getEnv(key string, defaultValue string) string {
-	v := os.Getenv(key)
-	if v == "" {
-		return defaultValue
-	}
-	return v
-}
-
-func setCrashOutput() {
-	crashFile, _ := os.Create("crash.log")
-	_ = debug.SetCrashOutput(crashFile, debug.CrashOptions{})
+	log.Println("Server exited")
 }
